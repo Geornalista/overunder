@@ -67,6 +67,9 @@ def limpa_e_calcula(liga):
 
     clubes = list(df.Home.unique())
 
+    casa = st.sidebar.selectbox('Escolha o Mandante',clubes)
+    fora = st.sidebar.selectbox('Escolha o Visitante',clubes)
+
     # JOGOS OVER 2.5
     df_O25 = df.query('GOLS > 2.5')
     # JOGOS OVER 1.5
@@ -98,14 +101,56 @@ def limpa_e_calcula(liga):
         taxa = 100 * (dfover.query(texto1).shape[0] / df.query(texto1).shape[0])
 
         tabela.append([clube,round(taxa,2)])
+    
+    stats1 = []
+    stats2 = []
+    textoc = 'Home == "'+casa+'"'
+    textof = 'Away == "'+fora+'"'
+    textoamc = 'Home == "'+casa+'" | Away == "'+casa+'"'
+    textoamf = 'Home == "'+fora+'" | Away == "'+fora+'"'
+
+    taxa_c_o05 = 100 * (df_O5.query(textoc).shape[0] / df.query(textoc).shape[0])
+    taxa_c_o15 = 100 * (df_O15.query(textoc).shape[0] / df.query(textoc).shape[0])
+    taxa_c_o25 = 100 * (df_O25.query(textoc).shape[0] / df.query(textoc).shape[0])
+    taxa_am_c = 100 * (df_ambas.query(textoc).shape[0] / df.query(textoc).shape[0])
+    taxa_f_o05 = 100 * (df_O5.query(textof).shape[0] / df.query(textof).shape[0])
+    taxa_f_o15 = 100 * (df_O15.query(textof).shape[0] / df.query(textof).shape[0])
+    taxa_f_o25 = 100 * (df_O25.query(textof).shape[0] / df.query(textof).shape[0])
+    taxa_am_f = 100 * (df_ambas.query(textof).shape[0] / df.query(textof).shape[0])
+
+    taxa_cg_o05 = 100 * (df_O5.query(textoamc).shape[0] / df.query(textoamc).shape[0])
+    taxa_cg_o15 = 100 * (df_O15.query(textoamc).shape[0] / df.query(textoamc).shape[0])
+    taxa_cg_o25 = 100 * (df_O25.query(textoamc).shape[0] / df.query(textoamc).shape[0])    
+    taxa_amg_c = 100 * (df_ambas.query(textoamc).shape[0] / df.query(textoamc).shape[0])
+    taxa_fg_o05 = 100 * (df_O5.query(textoamf).shape[0] / df.query(textoamf).shape[0])
+    taxa_fg_o15 = 100 * (df_O15.query(textoamf).shape[0] / df.query(textoamf).shape[0])
+    taxa_fg_o25 = 100 * (df_O25.query(textoamf).shape[0] / df.query(textoamf).shape[0])    
+    taxa_amg_f = 100 * (df_ambas.query(textoamf).shape[0] / df.query(textoamf).shape[0])
+
+    stats1.append([casa,round(taxa_c_o05),round(taxa_c_o15),round(taxa_c_o25),round(taxa_am_c)])
+    stats1.append([fora,round(taxa_f_o05),round(taxa_f_o15),round(taxa_f_o25),round(taxa_am_f)])
+
+    stats2.append([casa,round(taxa_cg_o05),round(taxa_cg_o15),round(taxa_cg_o25),round(taxa_amg_c)])
+    stats2.append([fora,round(taxa_fg_o05),round(taxa_fg_o15),round(taxa_fg_o25),round(taxa_amg_f)])
 
     tabela = pd.DataFrame(tabela, columns=['CLUBE','TAXA'])
+    
+    stats1 = pd.DataFrame(stats1, columns=['CLUBE','Over 0.5 (%)','Over 1.5 (%)','Over 2.5 (%)','Ambos Marcam (%)'],
+                index=['Mandante','Visitante'])
+
+    stats2 = pd.DataFrame(stats2, columns=['CLUBE','Over 0.5 (%)','Over 1.5 (%)','Over 2.5 (%)','Ambos Marcam (%)'],
+                index=['Time 1','Time 2'])
+    
+    st.write('Estatísticas por mando')
+    st.dataframe(stats1)
+    st.write('Estatísticas por time')
+    st.dataframe(stats2)
 
     return tabela
 
 def figura(df):
     fig, ax = plt.subplots(figsize=(3,5))
-    fs = 20
+    fs = 12
     ls = 8
 
     df = df.sort_values('TAXA',ascending=True)
@@ -136,12 +181,14 @@ ligas = ["Alemanha","Alemanha2",
         "Suiça","Suécia",
         "Escócia","Brasil",]
 
-
 st.sidebar.title("Projeto Over / Under")
 
 dropdown = st.sidebar.selectbox('Escolha a liga', ligas)
 
-mando = st.sidebar.radio('Escolha um item:',['CASA','FORA','TOTAL'])
-gols = st.sidebar.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
+mando = st.sidebar.radio('',['CASA','FORA','AMBOS'])
+gols = st.sidebar.radio('',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
 figura(limpa_e_calcula(dropdown))
+
+#st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
+#st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
