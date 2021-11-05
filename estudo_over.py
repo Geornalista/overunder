@@ -10,10 +10,15 @@ def limpa_e_calcula(liga):
 
     links = {
             'alemanha': "https://www.football-data.co.uk/mmz4281/2122/D1.csv",
+            'alemanha2': "https://www.football-data.co.uk/mmz4281/2122/D2.csv",
             'espanha': "https://www.football-data.co.uk/mmz4281/2122/SP1.csv",
+            'espanha2': "https://www.football-data.co.uk/mmz4281/2122/SP2.csv",
             'franca': "https://www.football-data.co.uk/mmz4281/2122/F1.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
             'inglaterra': "https://www.football-data.co.uk/mmz4281/2122/E0.csv",
+            'inglaterra2': "https://www.football-data.co.uk/mmz4281/2122/E1.csv",
             'italia': "https://www.football-data.co.uk/mmz4281/2122/I1.csv",
+            'italia2': "https://www.football-data.co.uk/mmz4281/2122/I2.csv",
             'belgica': "https://www.football-data.co.uk/mmz4281/2122/B1.csv",
             'holanda': "https://www.football-data.co.uk/mmz4281/2122/N1.csv",
             'portugal': "https://www.football-data.co.uk/mmz4281/2122/P1.csv",
@@ -26,7 +31,8 @@ def limpa_e_calcula(liga):
             'brasil': "https://www.football-data.co.uk/new/BRA.csv"
     }
 
-    liga1 = ['alemanha','espanha','franca','inglaterra','italia','belgica','holanda','portugal','turquia','escocia']
+    liga1 = ['alemanha','alemanha2','espanha','espanha2','franca','franca2','inglaterra','inglaterra2',
+            'italia','italia2','belgica','holanda','portugal','turquia','escocia']
   
     df = pd.read_csv(links[liga])
 
@@ -119,19 +125,23 @@ def figura(df):
 
     st.pyplot(fig)
 
-ligas = ["Alemanha","Espanha","França","Inglaterra","Itália","Bélgica",
-            "Holanda","Portugal","Turquia","Escócia","Dinamarca","Noruega",
-            "Suiça","Suécia","Brasil"]
+ligas = ["Alemanha","Alemanha2",
+        "Espanha","Espanha2",
+        "França","França2",
+        "Inglaterra","Inglaterra2",
+        "Itália","Itália2",
+        "Bélgica","Holanda",
+        "Portugal","Turquia",
+        "Dinamarca","Noruega",
+        "Suiça","Suécia",
+        "Escócia","Brasil",]
 
 
 st.sidebar.title("Projeto Over / Under")
 
-dropdown = st.selectbox('Escolha a liga', ligas)
+dropdown = st.sidebar.selectbox('Escolha a liga', ligas)
 
 mando = st.sidebar.radio('Escolha um item:',['CASA','FORA','TOTAL'])
 gols = st.sidebar.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
 figura(limpa_e_calcula(dropdown))
-
-#st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
-#st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
