@@ -50,6 +50,14 @@ def limpa_e_calcula(liga):
         df.drop(['Country','League','Season','Time','MaxH','MaxD','MaxA','AvgH','AvgD','AvgA'],axis=1,inplace=True)
 
     df['GOLS'] = df['HG'] + df['AG']
+    
+    def ambas(df):
+        if (df['HG'] > 0) & (df['AG'] > 0):
+            return 1
+        else:
+            return 0
+    
+    df['AMBAS'] = df.apply(ambas,axis=1)
 
     clubes = list(df.Home.unique())
 
@@ -59,6 +67,8 @@ def limpa_e_calcula(liga):
     df_O15 = df.query('GOLS > 1.5')
     # JOGOS OVER 0.5
     df_O5 = df.query('GOLS > 0.5')
+    # JOGOS AMBAS MARCAM
+    df_ambas = df.query('AMBAS == 1')
 
     tabela = []
 
@@ -74,8 +84,10 @@ def limpa_e_calcula(liga):
             dfover = df_O5
         elif gols == 'Over 1.5':
             dfover = df_O15
-        else:
+        elif gols == 'Over 2.5':
             dfover = df_O25
+        else:
+            dfover = df_ambas
 
         taxa = 100 * (dfover.query(texto1).shape[0] / df.query(texto1).shape[0])
 
@@ -86,8 +98,9 @@ def limpa_e_calcula(liga):
     return tabela
 
 def figura(df):
-    fig, ax = plt.subplots(figsize=(6,8))
+    fig, ax = plt.subplots(figsize=(4,6))
     fs = 20
+    ls = 8
 
     df = df.sort_values('TAXA',ascending=True)
 
@@ -97,8 +110,10 @@ def figura(df):
     ax.set_xlim([0, 100])
     ax.set_xlabel('Aproveitamento %')
     ax.grid(axis='x',color='k',alpha=0.3)
-    ax.tick_params(axis='y', which='major', labelsize=15)
-    ax.tick_params(axis='x', which='both', labelsize=10)
+    ax.tick_params(axis='y', which='major', labelsize=ls)
+    ax.tick_params(axis='x', which='both', labelsize=ls)
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position('top')
 
     plt.xticks(np.arange(0, 110, 10))
 
@@ -114,7 +129,7 @@ st.title("ESTUDO OVER GOLS")
 dropdown = st.selectbox('Escolha a liga', ligas)
 
 mando = st.radio('Escolha um item:',['CASA','FORA','TOTAL'])
-gols = st.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5'])
+gols = st.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
 figura(limpa_e_calcula(dropdown))
 
