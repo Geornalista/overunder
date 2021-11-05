@@ -98,17 +98,17 @@ def limpa_e_calcula(liga):
     return tabela
 
 def figura(df):
-    fig, ax = plt.subplots(figsize=(4,6))
+    fig, ax = plt.subplots(figsize=(3,5))
     fs = 20
     ls = 8
 
     df = df.sort_values('TAXA',ascending=True)
 
     ax.barh(df.CLUBE,df.TAXA,color='darkgreen')
-    ax.set_title(dropdown+' - '+gols+' - '+mando,fontsize=fs)
+    ax.set_title(dropdown+' - '+gols+' - '+mando+'\n',fontsize=fs)
 
     ax.set_xlim([0, 100])
-    ax.set_xlabel('Aproveitamento %')
+    ax.set_xlabel('Aproveitamento %\n')
     ax.grid(axis='x',color='k',alpha=0.3)
     ax.tick_params(axis='y', which='major', labelsize=ls)
     ax.tick_params(axis='x', which='both', labelsize=ls)
@@ -124,14 +124,14 @@ ligas = ["Alemanha","Espanha","França","Inglaterra","Itália","Bélgica",
             "Suiça","Suécia","Brasil"]
 
 
-st.title("ESTUDO OVER GOLS")
+st.sidebar.title("Projeto Over / Under")
 
 dropdown = st.selectbox('Escolha a liga', ligas)
 
-mando = st.radio('Escolha um item:',['CASA','FORA','TOTAL'])
-gols = st.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
+mando = st.sidebar.radio('Escolha um item:',['CASA','FORA','TOTAL'])
+gols = st.sidebar.radio('Escolha o limite de gols:',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
 figura(limpa_e_calcula(dropdown))
 
-st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
-st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
+#st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
+#st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
