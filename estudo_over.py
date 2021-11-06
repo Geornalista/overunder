@@ -67,8 +67,8 @@ def limpa_e_calcula(liga):
 
     clubes = list(df.Home.unique())
 
-    casa = st.sidebar.selectbox('Escolha o Mandante',clubes)
-    fora = st.sidebar.selectbox('Escolha o Visitante',clubes)
+    casa = st.sidebar.selectbox('Mandante',clubes)
+    fora = st.sidebar.selectbox('Visitante',clubes)
 
     # JOGOS OVER 2.5
     df_O25 = df.query('GOLS > 2.5')
@@ -135,11 +135,11 @@ def limpa_e_calcula(liga):
 
     tabela = pd.DataFrame(tabela, columns=['CLUBE','TAXA'])
     
-    stats1 = pd.DataFrame(stats1, columns=['CLUBE','Over 0.5 (%)','Over 1.5 (%)','Over 2.5 (%)','Ambos Marcam (%)'],
+    stats1 = pd.DataFrame(stats1, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
                 index=['Mandante','Visitante'])
 
-    stats2 = pd.DataFrame(stats2, columns=['CLUBE','Over 0.5 (%)','Over 1.5 (%)','Over 2.5 (%)','Ambos Marcam (%)'],
-                index=['Time 1','Time 2'])
+    stats2 = pd.DataFrame(stats2, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
+                index=['',''])
     
     st.write('Estatísticas por mando')
     st.dataframe(stats1)
