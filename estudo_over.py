@@ -129,22 +129,26 @@ def limpa_e_calcula(liga):
 
     stats1.append([casa,round(taxa_c_o05),round(taxa_c_o15),round(taxa_c_o25),round(taxa_am_c)])
     stats1.append([fora,round(taxa_f_o05),round(taxa_f_o15),round(taxa_f_o25),round(taxa_am_f)])
+    stats1.append(['MÉDIA',round((taxa_c_o05+taxa_f_o05)/2),round((taxa_c_o15+taxa_f_o15)/2),
+                          round((taxa_c_o25+taxa_f_o25)/2),round((taxa_am_c+taxa_am_f)/2)])
 
     stats2.append([casa,round(taxa_cg_o05),round(taxa_cg_o15),round(taxa_cg_o25),round(taxa_amg_c)])
     stats2.append([fora,round(taxa_fg_o05),round(taxa_fg_o15),round(taxa_fg_o25),round(taxa_amg_f)])
+    stats2.append(['MÉDIA',round((taxa_cg_o05+taxa_fg_o05)/2),round((taxa_cg_o15+taxa_fg_o15)/2),
+                          round((taxa_cg_o25+taxa_fg_o25)/2),round((taxa_amg_c+taxa_amg_f)/2)])
 
     tabela = pd.DataFrame(tabela, columns=['CLUBE','TAXA'])
     
     stats1 = pd.DataFrame(stats1, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
-                index=['Mandante','Visitante'])
+                index=['Mandante','Visitante','MÉDIA'])
 
     stats2 = pd.DataFrame(stats2, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
-                index=['',''])
+                index=['','','MÉDIA'])
     
     st.write('Estatísticas por mando')
-    st.dataframe(stats1)
+    st.table(stats1)
     st.write('Estatísticas por time')
-    st.dataframe(stats2)
+    st.table(stats2)
 
     return tabela
 
@@ -156,6 +160,7 @@ def figura(df):
     df = df.sort_values('TAXA',ascending=True)
 
     ax.barh(df.CLUBE,df.TAXA,color='darkgreen')
+    
     ax.set_title(dropdown+' - '+gols+' - '+mando+'\n',fontsize=fs)
 
     ax.set_xlim([0, 100])
