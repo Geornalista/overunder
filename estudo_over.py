@@ -146,22 +146,31 @@ def limpa_e_calcula(liga):
                 index=['','','MÉDIA'])
     
     st.write('Estatísticas por mando')
-    st.table(stats1)
+    st.dataframe(stats1)
     st.write('Estatísticas por time')
-    st.table(stats2)
+    st.dataframe(stats2)
 
-    return tabela
+    return tabela,casa,fora
 
-def figura(df):
-    fig, ax = plt.subplots(figsize=(3,5))
-    fs = 12
-    ls = 8
+
+def figura(df,casa,fora):
+    fig, ax = plt.subplots(figsize=(3,3))
+    fs = 6
+    ls = 6
 
     df = df.sort_values('TAXA',ascending=True)
+    lista = df.CLUBE.tolist()
+    ncasa = lista.index(casa)
+    nfora = lista.index(fora)
 
-    ax.barh(df.CLUBE,df.TAXA,color='darkgreen')
+    cor = ["indigo"]*len(lista)
+    cor[ncasa] = "lime"
+    cor[nfora] = "lime"
+    
+    ax.barh(df.CLUBE,df.TAXA,height=0.6,color=cor,edgecolor="k",linewidth=0.3)
     
     ax.set_title(dropdown+' - '+gols+' - '+mando+'\n',fontsize=fs)
+    ax.set_facecolor('ivory')
 
     ax.set_xlim([0, 100])
     ax.set_xlabel('Aproveitamento %\n')
@@ -193,7 +202,8 @@ dropdown = st.sidebar.selectbox('Escolha a liga', ligas)
 mando = st.sidebar.radio('',['CASA','FORA','AMBOS'])
 gols = st.sidebar.radio('',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
-figura(limpa_e_calcula(dropdown))
+df,casa,fora = limpa_e_calcula(dropdown)
+figura(df,casa,fora)
 
 #st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
 #st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
