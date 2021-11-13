@@ -7,7 +7,7 @@ import unidecode
 def limpa_e_calcula(liga):
     
     liga = unidecode.unidecode(liga.lower())
-
+    
     links = {
             'alemanha': "https://www.football-data.co.uk/mmz4281/2122/D1.csv",
             'alemanha2': "https://www.football-data.co.uk/mmz4281/2122/D2.csv",
@@ -55,8 +55,137 @@ def limpa_e_calcula(liga):
 
         df.drop(['Country','League','Season','Time','MaxH','MaxD','MaxA','AvgH','AvgD','AvgA'],axis=1,inplace=True)
 
-    df['GOLS'] = df['HG'] + df['AG']
+    clubes = list(df.Home.unique())
+
+    casa = st.sidebar.selectbox('Mandante',clubes)
+    fora = st.sidebar.selectbox('Visitante',clubes)
     
+    df['GOLS'] = df['HG'] + df['AG']
+
+    def fav_h(df):
+        if (df['PH'] <= df['PA']):
+            if (df['PH'] <= df['PD']):
+                return 1
+        else:
+            return 0
+
+    def fav_a(df):
+        if (df['PA'] <= df['PH']):
+            if (df['PA'] <= df['PD']):
+                return 1
+        else:
+            return 0
+
+    def fav_d(df):
+        if (df['FAV_H'] == 1):
+            return 0       
+        if (df['FAV_A'] == 1):
+            return 0
+        else:
+            return 1
+
+    def fav_bet(df):
+        if (df['FAV_H']  == 1):
+            return "H"
+        elif (df['FAV_A'] == 1):
+            return "A"
+        else:
+            return "D"
+
+    def fav_fim(df):
+        if (df['Res'] == df['FAV_BET']):
+            return 1
+        else:
+            return 0
+
+    def tabela(df,time,mando):
+        if mando == "casa":
+            txt = 'Home == "'+time+'" & FAV_H == 1'
+            tmp1 = df.query(txt).sum()[-5]
+        else:
+            txt = 'Away == "'+time+'" & FAV_A == 1'
+            tmp1 = df.query(txt).sum()[-4]
+        
+        tmp2 = df.query(txt).sum()[-1]
+        
+        if tmp1 > 0:
+            des = 100 * tmp2 / tmp1
+            return round(des,2),tmp1
+        else:
+            return 0,tmp1
+    
+    def desempenho(tabH,tabA,liga):
+        fig, (ax1,ax2) = plt.subplots(1,2,figsize=(16,12))
+        fs = 20
+        ls = 20
+        tabH = tabH.sort_values(tabH.columns[1],ascending=True)
+        tabA = tabA.sort_values(tabA.columns[1],ascending=True)
+
+        jgH = list(tabH.JOGOS)
+        jgA = list(tabA.JOGOS)
+
+        ax1.barh(tabH.CLUBE,tabH.APROVEITAMENTO,height=0.6,color='green',edgecolor="k",linewidth=0.3)
+        ax2.barh(tabA.CLUBE,tabA.APROVEITAMENTO,height=0.6,color='green',edgecolor="k",linewidth=0.3)
+
+        ax1.set_title('Favorito como Mandante (# jogos)',fontsize=fs)
+        ax1.set_facecolor('ivory')
+        ax1.set_xlabel('Aproveitamento %',fontsize=20)
+        ax1.grid(axis='x',color='k',alpha=0.3)
+        ax1.tick_params(axis='y', which='major', labelsize=ls)
+        ax1.tick_params(axis='x', which='both', labelsize=ls)
+        ax1.set_xlim([0, 120])
+
+        for i, p in enumerate(ax1.patches):
+            #width = p.get_width()
+            ax1.text(10+p.get_width(), p.get_y()+0.55*p.get_height(),
+                    '({:2.0f})'.format(jgH[i]),
+                    ha='center', va='center',size=fs)
+
+        ax2.set_title('Favorito como Visitante (# jogos)',fontsize=fs)
+        ax2.set_facecolor('ivory')
+        ax2.set_xlabel('Aproveitamento %',fontsize=20)
+        ax2.grid(axis='x',color='k',alpha=0.3)
+        ax2.tick_params(axis='y', which='major', labelsize=ls)
+        ax2.tick_params(axis='x', which='both', labelsize=ls)
+        ax2.set_xlim([0, 120])
+
+        for i, p in enumerate (ax2.patches):
+            #width = p.get_width()
+            ax2.text(10+p.get_width(), p.get_y()+0.55*p.get_height(),
+                    '({:2.0f})'.format(jgA[i]),
+                    ha='center', va='center',size=fs)
+        
+        fig.tight_layout(pad=3.0)
+
+        st.pyplot(fig)
+
+    # CALCULO DOS FAVORITOS ====================================
+    df['FAV_H'] = df.apply(fav_h,axis=1)
+    df['FAV_A'] = df.apply(fav_a,axis=1)
+    df['FAV_D'] = df.apply(fav_d,axis=1)
+    df['FAV_BET'] = df.apply(fav_bet,axis=1)
+    df['FAV'] = df.apply(fav_fim,axis=1)
+
+    listaH = df.Home.unique()
+    listaA = df.Away.unique()
+    
+    tabelaH=[]
+    for time in listaH:
+        des1,jc = tabela(df,time,'casa')
+        tabelaH.append([time,des1,jc])
+    
+    tabelaA=[]
+    for time in listaA:
+        des2,jf = tabela(df,time,'fora')
+        tabelaA.append([time,des2,jf])
+
+    tabH = pd.DataFrame(tabelaH, columns=['CLUBE','APROVEITAMENTO','JOGOS'])
+    tabA = pd.DataFrame(tabelaA, columns=['CLUBE','APROVEITAMENTO','JOGOS'])
+
+    desempenho(tabH,tabA,liga)
+
+    # FIM DO FAVORITO =================================================
+
     def ambas(df):
         if (df['HG'] > 0) & (df['AG'] > 0):
             return 1
@@ -64,11 +193,6 @@ def limpa_e_calcula(liga):
             return 0
     
     df['AMBAS'] = df.apply(ambas,axis=1)
-
-    clubes = list(df.Home.unique())
-
-    casa = st.sidebar.selectbox('Mandante',clubes)
-    fora = st.sidebar.selectbox('Visitante',clubes)
 
     # JOGOS OVER 2.5
     df_O25 = df.query('GOLS > 2.5')
@@ -79,28 +203,28 @@ def limpa_e_calcula(liga):
     # JOGOS AMBAS MARCAM
     df_ambas = df.query('AMBAS == 1')
 
-    tabela = []
+    # tabela = []
 
-    for clube in clubes:
-        if mando == 'CASA':
-            texto1 = 'Home == "'+clube+'"'
-        elif mando == 'FORA':
-            texto1 = 'Away == "'+clube+'"'
-        else:
-            texto1 = 'Home == "'+clube+'" | Away == "'+clube+'"'
+    # for clube in clubes:
+    #     if mando == 'CASA':
+    #         texto1 = 'Home == "'+clube+'"'
+    #     elif mando == 'FORA':
+    #         texto1 = 'Away == "'+clube+'"'
+    #     else:
+    #         texto1 = 'Home == "'+clube+'" | Away == "'+clube+'"'
 
-        if gols == 'Over 0.5':
-            dfover = df_O5
-        elif gols == 'Over 1.5':
-            dfover = df_O15
-        elif gols == 'Over 2.5':
-            dfover = df_O25
-        else:
-            dfover = df_ambas
+    #     if gols == 'Over 0.5':
+    #         dfover = df_O5
+    #     elif gols == 'Over 1.5':
+    #         dfover = df_O15
+    #     elif gols == 'Over 2.5':
+    #         dfover = df_O25
+    #     else:
+    #         dfover = df_ambas
 
-        taxa = 100 * (dfover.query(texto1).shape[0] / df.query(texto1).shape[0])
+    #     taxa = 100 * (dfover.query(texto1).shape[0] / df.query(texto1).shape[0])
 
-        tabela.append([clube,round(taxa,2)])
+    #     tabela.append([clube,round(taxa,2)])
     
     stats1 = []
     stats2 = []
@@ -137,7 +261,7 @@ def limpa_e_calcula(liga):
     stats2.append(['MÉDIA',round((taxa_cg_o05+taxa_fg_o05)/2),round((taxa_cg_o15+taxa_fg_o15)/2),
                           round((taxa_cg_o25+taxa_fg_o25)/2),round((taxa_amg_c+taxa_amg_f)/2)])
 
-    tabela = pd.DataFrame(tabela, columns=['CLUBE','TAXA'])
+    #tabela = pd.DataFrame(tabela, columns=['CLUBE','TAXA'])
     
     stats1 = pd.DataFrame(stats1, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
                 index=['Mandante','Visitante','MÉDIA'])
@@ -145,13 +269,12 @@ def limpa_e_calcula(liga):
     stats2 = pd.DataFrame(stats2, columns=['CLUBE','0.5 (%)','1.5 (%)','2.5 (%)','AM (%)'],
                 index=['','','MÉDIA'])
     
-    st.write('Estatísticas por mando')
+    st.title('Estatísticas por mando')
     st.dataframe(stats1)
-    st.write('Estatísticas por time')
+    st.title('Estatísticas por time')
     st.dataframe(stats2)
 
-    return tabela,casa,fora
-
+    #return tabela,casa,fora
 
 def figura(df,casa,fora):
     fig, ax = plt.subplots(figsize=(3,3))
@@ -197,13 +320,16 @@ ligas = ["Alemanha","Alemanha2",
 
 st.sidebar.title("Projeto Over / Under")
 
+st.title("Favorito segundo as odds - BET365")
+
 dropdown = st.sidebar.selectbox('Escolha a liga', ligas)
 
-mando = st.sidebar.radio('',['CASA','FORA','AMBOS'])
-gols = st.sidebar.radio('',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
+#mando = st.sidebar.radio('',['CASA','FORA','AMBOS'])
+#gols = st.sidebar.radio('',['Over 0.5','Over 1.5','Over 2.5','Ambas Marcam'])
 
-df,casa,fora = limpa_e_calcula(dropdown)
-figura(df,casa,fora)
+limpa_e_calcula(dropdown)
+#df,casa,fora = limpa_e_calcula(dropdown)
+#figura(df,casa,fora)
 
 #st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center;} </style>', unsafe_allow_html=True)
 #st.write('<style>div.st-bf{flex-direction:column;} div.st-ag{font-weight:bold;padding-left:2px;}</style>', unsafe_allow_html=True)
