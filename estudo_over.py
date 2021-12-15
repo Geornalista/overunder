@@ -23,6 +23,9 @@ def limpa_e_calcula(liga):
             'holanda': "https://www.football-data.co.uk/mmz4281/2122/N1.csv",
             'portugal': "https://www.football-data.co.uk/mmz4281/2122/P1.csv",
             'turquia': "https://www.football-data.co.uk/mmz4281/2122/T1.csv",
+            'grecia':"https://www.football-data.co.uk/mmz4281/2122/G1.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
             'escocia': "https://www.football-data.co.uk/mmz4281/2122/SC0.csv",
             'dinamarca': "https://www.football-data.co.uk/new/DNK.csv",
             'noruega': "https://www.football-data.co.uk/new/NOR.csv",
@@ -32,7 +35,7 @@ def limpa_e_calcula(liga):
     }
 
     liga1 = ['alemanha','alemanha2','espanha','espanha2','franca','franca2','inglaterra','inglaterra2',
-            'italia','italia2','belgica','holanda','portugal','turquia','escocia']
+            'italia','italia2','belgica','holanda','portugal','turquia','grecia','escocia']
   
     df = pd.read_csv(links[liga])
 
@@ -313,7 +316,7 @@ ligas = ["Alemanha","Alemanha2",
         "Inglaterra","Inglaterra2",
         "Itália","Itália2",
         "Bélgica","Holanda",
-        "Portugal","Turquia",
+        "Portugal","Turquia","Grécia",
         "Dinamarca","Noruega",
         "Suiça","Suécia",
         "Escócia","Brasil",]
