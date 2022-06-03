@@ -54,7 +54,7 @@ def limpa_e_calcula(liga):
         if liga in ['dinamarca','suica']:
             df = df.query("Season == '2021/2022'")
         else:
-            df = df.query("Season == 2021")
+            df = df.query("Season == 2022")
 
         df.drop(['Country','League','Season','Time','MaxH','MaxD','MaxA','AvgH','AvgD','AvgA'],axis=1,inplace=True)
 
