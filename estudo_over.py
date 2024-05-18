@@ -5,28 +5,28 @@ import streamlit as st
 import unidecode
 
 def limpa_e_calcula(liga):
-    
+    ano = '2324'
     liga = unidecode.unidecode(liga.lower())
     
     links = {
-            'alemanha': "https://www.football-data.co.uk/mmz4281/2122/D1.csv",
-            'alemanha2': "https://www.football-data.co.uk/mmz4281/2122/D2.csv",
-            'espanha': "https://www.football-data.co.uk/mmz4281/2122/SP1.csv",
-            'espanha2': "https://www.football-data.co.uk/mmz4281/2122/SP2.csv",
-            'franca': "https://www.football-data.co.uk/mmz4281/2122/F1.csv",
-            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
-            'inglaterra': "https://www.football-data.co.uk/mmz4281/2122/E0.csv",
-            'inglaterra2': "https://www.football-data.co.uk/mmz4281/2122/E1.csv",
-            'italia': "https://www.football-data.co.uk/mmz4281/2122/I1.csv",
-            'italia2': "https://www.football-data.co.uk/mmz4281/2122/I2.csv",
-            'belgica': "https://www.football-data.co.uk/mmz4281/2122/B1.csv",
-            'holanda': "https://www.football-data.co.uk/mmz4281/2122/N1.csv",
-            'portugal': "https://www.football-data.co.uk/mmz4281/2122/P1.csv",
-            'turquia': "https://www.football-data.co.uk/mmz4281/2122/T1.csv",
-            'grecia':"https://www.football-data.co.uk/mmz4281/2122/G1.csv",
-            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
-            'franca2': "https://www.football-data.co.uk/mmz4281/2122/F2.csv",
-            'escocia': "https://www.football-data.co.uk/mmz4281/2122/SC0.csv",
+            'alemanha': "https://www.football-data.co.uk/mmz4281/2324/D1.csv",
+            'alemanha2': "https://www.football-data.co.uk/mmz4281/2324/D2.csv",
+            'espanha': "https://www.football-data.co.uk/mmz4281/2324/SP1.csv",
+            'espanha2': "https://www.football-data.co.uk/mmz4281/2324/SP2.csv",
+            'franca': "https://www.football-data.co.uk/mmz4281/2324/F1.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2324/F2.csv",
+            'inglaterra': "https://www.football-data.co.uk/mmz4281/2324/E0.csv",
+            'inglaterra2': "https://www.football-data.co.uk/mmz4281/2324/E1.csv",
+            'italia': "https://www.football-data.co.uk/mmz4281/2324/I1.csv",
+            'italia2': "https://www.football-data.co.uk/mmz4281/2324/I2.csv",
+            'belgica': "https://www.football-data.co.uk/mmz4281/2324/B1.csv",
+            'holanda': "https://www.football-data.co.uk/mmz4281/2324/N1.csv",
+            'portugal': "https://www.football-data.co.uk/mmz4281/2324/P1.csv",
+            'turquia': "https://www.football-data.co.uk/mmz4281/2324/T1.csv",
+            'grecia':"https://www.football-data.co.uk/mmz4281/2324/G1.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2324/F2.csv",
+            'franca2': "https://www.football-data.co.uk/mmz4281/2324/F2.csv",
+            'escocia': "https://www.football-data.co.uk/mmz4281/2324/SC0.csv",
             'dinamarca': "https://www.football-data.co.uk/new/DNK.csv",
             'noruega': "https://www.football-data.co.uk/new/NOR.csv",
             'suica': "https://www.football-data.co.uk/new/SWZ.csv",
@@ -52,9 +52,9 @@ def limpa_e_calcula(liga):
     
     else:
         if liga in ['dinamarca','suica']:
-            df = df.query("Season == '2021/2022'")
+            df = df.query("Season == '2023/2024'")
         else:
-            df = df.query("Season == 2022")
+            df = df.query("Season == 2024")
 
         df.drop(['Country','League','Season','Time','MaxH','MaxD','MaxA','AvgH','AvgD','AvgA'],axis=1,inplace=True)
 
