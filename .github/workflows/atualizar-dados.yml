@@ -1,0 +1,46 @@
+name: Atualizar dados das ligas
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar pastas
+        run: |
+          mkdir -p data/football-data
+          mkdir -p data/australia
+
+      - name: Baixar ligas football-data
+        run: |
+          set -e
+          base="https://www.football-data.co.uk"
+          for item in "D1" "D2" "SP1" "SP2" "F1" "F2" "E0" "E1" "I1" "I2" "B1" "N1" "P1" "T1" "G1" "SC0"; do
+            curl -L --fail --retry 3 -o "data/football-data/${item}.csv" "${base}/mmz4281/2627/${item}.csv"
+          done
+          for item in "DNK" "SWZ" "NOR" "SWE" "BRA"; do
+            curl -L --fail --retry 3 -o "data/football-data/${item}.csv" "${base}/new/${item}.csv"
+          done
+
+      - name: Baixar A-League
+        run: |
+          curl -L --fail --retry 3 \
+            -o data/australia/a-league.xlsx \
+            https://www.aussportsbetting.com/historical_data/a-league.xlsx
+
+      - name: Commitar dados atualizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Atualiza dados das ligas"
+          git push
