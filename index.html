@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estatísticas Over / Under Gols</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--border:#e5e7eb;--accent:#2563eb;--soft:#eff6ff;--shadow:0 10px 30px rgba(15,23,42,.07)}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f8fafc,#f3f6fb);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.container{max-width:1450px;margin:auto;padding:28px}.header,.controls,.card{background:var(--card);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow)}
+.header{padding:24px 28px;margin-bottom:20px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h1{margin:5px 0;font-size:clamp(25px,3vw,36px);letter-spacing:-.035em}.subtitle{color:var(--muted);margin:0}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}label{display:block;font-size:13px;font-weight:750;margin-bottom:8px}
+select{width:100%;padding:12px 14px;border:1px solid #d8dee9;border-radius:11px;background:#fff;color:var(--text);font-size:15px;outline:none}select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.status{margin-top:16px;padding:12px 15px;border-radius:12px;background:var(--soft);color:#1e40af;font-size:13px;display:none}.card{margin-top:20px;padding:10px 8px 5px}#chart{width:100%;height:800px}.note{color:var(--muted);font-size:12px;padding:0 16px 14px}
+@media(max-width:700px){.container{padding:14px}.controls{grid-template-columns:1fr}#chart{height:1050px}.header{padding:20px}}
+</style>
+</head>
+<body>
+<div class="container">
+<section class="header"><div class="eyebrow">Football Analytics</div><h1>Estatísticas Over / Under Gols</h1><p class="subtitle">Análise de gols por equipe como mandante e visitante.</p></section>
+<section class="controls">
+<div><label for="league">Escolha a liga</label><select id="league"></select></div>
+<div><label for="attribute">Escolha o atributo</label><select id="attribute"><option>Over 0.5</option><option>Over 1.5</option><option>Over 2.5</option><option>Ambos Marcam</option><option>Jogos 0x0</option></select></div>
+</section>
+<div id="status" class="status"></div>
+<section class="card"><div id="chart"></div><div class="note">Percentual de jogos por clube, separado entre mandante e visitante.</div></section>
+</div>
+
+<script>
+const leagues=["Alemanha","Alemanha2","Espanha","Espanha2","França","França2","Inglaterra","Inglaterra2","Itália","Itália2","Bélgica","Holanda","Portugal","Turquia","Grécia","Escócia","Dinamarca","Noruega","Suíça","Suécia","Brasil","Austrália"];
+const codes={"Alemanha":"D1","Alemanha2":"D2","Espanha":"SP1","Espanha2":"SP2","França":"F1","França2":"F2","Inglaterra":"E0","Inglaterra2":"E1","Itália":"I1","Itália2":"I2","Bélgica":"B1","Holanda":"N1","Portugal":"P1","Turquia":"T1","Grécia":"G1","Escócia":"SC0"};
+const leagueEl=document.getElementById("league"),attrEl=document.getElementById("attribute"),statusEl=document.getElementById("status");
+leagues.forEach(l=>{let o=document.createElement("option");o.value=l;o.textContent=l;leagueEl.appendChild(o)});
+function status(t,on=true){statusEl.textContent=t;statusEl.style.display=on?"block":"none"}
+async function getText(path){let r=await fetch(path,{cache:"no-store"});if(!r.ok)throw new Error("Arquivo de dados não encontrado: "+path);return r.text()}
+function csv(text){let rows=[],row=[],f="",q=false;for(let i=0;i<text.length;i++){let c=text[i],n=text[i+1];if(c=='"'){if(q&&n=='"'){f+='"';i++}else q=!q}else if(c==","&&!q){row.push(f);f=""}else if((c=="\n"||c=="\r")&&!q){if(c=="\r"&&n=="\n")i++;row.push(f);f="";if(row.some(x=>x.trim()))rows.push(row);row=[]}else f+=c}if(f||row.length){row.push(f);rows.push(row)}if(!rows.length)return[];let h=rows[0].map(x=>x.trim());return rows.slice(1).map(r=>Object.fromEntries(h.map((x,i)=>[x,(r[i]??"").trim()])));}
+function norm(rows){return rows.map(r=>({Home:r.HomeTeam??r.Home??"",Away:r.AwayTeam??r.Away??"",HG:Number(r.FTHG??r.HG),AG:Number(r.FTAG??r.AG),Season:r.Season??r.SEASON??""})).filter(r=>r.Home&&r.Away&&Number.isFinite(r.HG)&&Number.isFinite(r.AG))}
+async function load(league){
+ if(codes[league])return norm(csv(await getText(`data/football-data/${codes[league]}.csv`)));
+ if(["Dinamarca","Suíça","Noruega","Suécia","Brasil"].includes(league)){
+   let file={Dinamarca:"DNK.csv",Suíça:"SWZ.csv",Noruega:"NOR.csv",Suécia:"SWE.csv",Brasil:"BRA.csv"}[league];
+   let rows=norm(csv(await getText(`data/football-data/${file}`)));
+   return rows.filter(r=>["Dinamarca","Suíça"].includes(league)?r.Season==="2026/2027":r.Season==="2026");
+ }
+ if(league==="Austrália"){
+   let r=await fetch("data/australia/a-league.xlsx",{cache:"no-store"});if(!r.ok)throw new Error("Arquivo da Austrália não encontrado");
+   let wb=XLSX.read(await r.arrayBuffer(),{type:"array",cellDates:true}),ws=wb.Sheets[wb.SheetNames[0]];
+   return XLSX.utils.sheet_to_json(ws,{range:1,defval:""}).map(x=>({Home:x["Home Team"]??"",Away:x["Away Team"]??"",HG:Number(x["Home Goals"]),AG:Number(x["Away Goals"]),Date:x.Date})).filter(x=>x.Home&&x.Away&&Number.isFinite(x.HG)&&Number.isFinite(x.AG)&&new Date(x.Date)>new Date("2025-10-01"));
+ }
+ throw new Error("Liga não configurada");
+}
+function calc(data,a){
+ let clubs=[...new Set(data.flatMap(r=>[r.Home,r.Away]))],out=[];
+ for(let c of clubs){let h=data.filter(r=>r.Home===c),v=data.filter(r=>r.Away===c);let m=rows=>{if(!rows.length)return 0;let n=0;for(let r of rows){let g=r.HG+r.AG,b=r.HG>0&&r.AG>0,ok=a==="Over 0.5"?g>.5:a==="Over 1.5"?g>1.5:a==="Over 2.5"?g>2.5:a==="Ambos Marcam"?b:g<1;if(ok)n++}return +(100*n/rows.length).toFixed(2)};out.push({CLUBE:c,CASA:m(h),FORA:m(v)})}return out
+}
+function draw(result,league,a){
+ let h=[...result].sort((x,y)=>x.CASA-y.CASA),v=[...result].sort((x,y)=>x.FORA-y.FORA);
+ let traces=[{x:h.map(x=>x.CASA),y:h.map(x=>x.CLUBE),type:"bar",orientation:"h",name:"CASA",marker:{color:"rgb(112,112,255)"},text:h.map(x=>x.CASA.toFixed(2)+"%"),textposition:"auto",hovertemplate:"%{y}<br>%{x:.2f}%<extra>MANDANTE</extra>"},{x:v.map(x=>x.FORA),y:v.map(x=>x.CLUBE),type:"bar",orientation:"h",name:"FORA",marker:{color:"rgb(69,94,69)"},text:v.map(x=>x.FORA.toFixed(2)+"%"),textposition:"auto",hovertemplate:"%{y}<br>%{x:.2f}%<extra>VISITANTE</extra>"}];
+ Plotly.newPlot("chart",traces,{title:{text:`${a.toUpperCase()} - ${league.toUpperCase()}`},barmode:"group",height:Math.max(800,h.length*32),margin:{l:120,r:45,t:75,b:45},paper_bgcolor:"#fff",plot_bgcolor:"#f3f4f6",font:{family:"Inter,system-ui,sans-serif",size:11,color:"#172033"},xaxis:{title:"Percentual (%)",ticksuffix:"%",rangemode:"tozero",gridcolor:"#e5e7eb"},yaxis:{automargin:true},legend:{orientation:"h",y:1.02,x:1,xanchor:"right"}},{responsive:true,displaylogo:false})
+}
+async function update(){let l=leagueEl.value,a=attrEl.value;status(`Carregando dados de ${l}...`);try{let d=await load(l);if(!d.length)throw Error("Nenhum jogo encontrado");draw(calc(d,a),l,a);status(`${d.length} jogos analisados em ${l}.`);setTimeout(()=>status("",false),2200)}catch(e){console.error(e);status("Não foi possível carregar os dados: "+e.message);Plotly.purge("chart")}}
+leagueEl.addEventListener("change",update);attrEl.addEventListener("change",update);update();
+</script>
+</body>
+</html>
