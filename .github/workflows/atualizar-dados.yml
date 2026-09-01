@@ -2,45 +2,217 @@ name: Atualizar dados das ligas
 
 on:
   schedule:
+    # Executa a cada 6 horas
     - cron: "17 */6 * * *"
+
+  # Permite executar manualmente pelo GitHub Actions
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+
   update-data:
+
     runs-on: ubuntu-latest
+
     steps:
+
+      # ==========================================================
+      # 1. Baixar o conteúdo atual do repositório
+      # ==========================================================
+
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+
+      # ==========================================================
+      # 2. Criar estrutura de diretórios
+      # ==========================================================
 
       - name: Criar pastas
         run: |
           mkdir -p data/football-data
           mkdir -p data/australia
 
+
+      # ==========================================================
+      # 3. Baixar ligas do Football-Data
+      #
+      # Temporada 2026/2027
+      #
+      # Estes são os mesmos códigos utilizados pelo app Python.
+      # ==========================================================
+
       - name: Baixar ligas football-data
+        shell: bash
         run: |
+
           set -e
-          base="https://www.football-data.co.uk"
-          for item in "D1" "D2" "SP1" "SP2" "F1" "F2" "E0" "E1" "I1" "I2" "B1" "N1" "P1" "T1" "G1" "SC0"; do
-            curl -L --fail --retry 3 -o "data/football-data/${item}.csv" "${base}/mmz4281/2627/${item}.csv"
-          done
-          for item in "DNK" "SWZ" "NOR" "SWE" "BRA"; do
-            curl -L --fail --retry 3 -o "data/football-data/${item}.csv" "${base}/new/${item}.csv"
+
+          BASE="https://www.football-data.co.uk"
+
+          echo "=========================================="
+          echo "Baixando ligas principais"
+          echo "=========================================="
+
+          for LEAGUE in \
+            D1 \
+            D2 \
+            SP1 \
+            SP2 \
+            F1 \
+            F2 \
+            E0 \
+            E1 \
+            I1 \
+            I2 \
+            B1 \
+            N1 \
+            P1 \
+            T1 \
+            G1 \
+            SC0
+          do
+
+            echo ""
+            echo "Baixando ${LEAGUE}.csv ..."
+
+            curl \
+              --location \
+              --fail \
+              --retry 3 \
+              --retry-delay 5 \
+              --connect-timeout 30 \
+              --max-time 120 \
+              --silent \
+              --show-error \
+              -o "data/football-data/${LEAGUE}.csv" \
+              "${BASE}/mmz4281/2627/${LEAGUE}.csv"
+
+            echo "OK: ${LEAGUE}.csv"
+
           done
 
-      - name: Baixar A-League
-        run: |
-          curl -L --fail --retry 3 \
-            -o data/australia/a-league.xlsx \
-            https://www.aussportsbetting.com/historical_data/a-league.xlsx
 
-      - name: Commitar dados atualizados
+          echo ""
+          echo "=========================================="
+          echo "Baixando ligas adicionais"
+          echo "=========================================="
+
+
+          for LEAGUE in DNK SWZ NOR SWE BRA
+          do
+
+            echo ""
+            echo "Baixando ${LEAGUE}.csv ..."
+
+            curl \
+              --location \
+              --fail \
+              --retry 3 \
+              --retry-delay 5 \
+              --connect-timeout 30 \
+              --max-time 120 \
+              --silent \
+              --show-error \
+              -o "data/football-data/${LEAGUE}.csv" \
+              "${BASE}/new/${LEAGUE}.csv"
+
+            echo "OK: ${LEAGUE}.csv"
+
+          done
+
+
+          echo ""
+          echo "=========================================="
+          echo "Download das ligas concluído"
+          echo "=========================================="
+
+
+      # ==========================================================
+      # 4. A-League
+      #
+      # O servidor do Australia Sports Betting está retornando
+      # HTTP 403 para requisições originadas pelo GitHub Actions.
+      #
+      # Portanto, NÃO tentamos baixar o arquivo automaticamente.
+      #
+      # Se já existir:
+      #
+      # data/australia/a-league.xlsx
+      #
+      # ele será preservado.
+      # ==========================================================
+
+      - name: Verificar A-League
+        shell: bash
         run: |
+
+          echo "=========================================="
+          echo "Verificando arquivo da A-League"
+          echo "=========================================="
+
+          if [ -f "data/australia/a-league.xlsx" ]; then
+
+            echo "Arquivo A-League encontrado."
+            echo "Ele será mantido."
+
+          else
+
+            echo "AVISO: arquivo da A-League não encontrado."
+            echo ""
+            echo "A A-League não será atualizada automaticamente"
+            echo "porque a fonte atualmente retorna HTTP 403"
+            echo "para o GitHub Actions."
+            echo ""
+            echo "As demais ligas continuarão normalmente."
+
+          fi
+
+
+      # ==========================================================
+      # 5. Mostrar os arquivos que foram baixados
+      # ==========================================================
+
+      - name: Verificar arquivos
+        run: |
+
+          echo "=========================================="
+          echo "Arquivos disponíveis"
+          echo "=========================================="
+
+          find data -type f -maxdepth 3 -print
+
+
+      # ==========================================================
+      # 6. Commitar alterações
+      # ==========================================================
+
+      - name: Committar dados atualizados
+        shell: bash
+        run: |
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add data/
-          git diff --cached --quiet || git commit -m "Atualiza dados das ligas"
-          git push
+
+          if git diff --cached --quiet; then
+
+            echo "Nenhuma alteração nos dados."
+            echo "Nenhum commit será criado."
+
+          else
+
+            echo "Alterações encontradas."
+            echo "Criando commit..."
+
+            git commit -m "Atualiza dados das ligas"
+
+            git push
+
+            echo "Dados atualizados com sucesso."
+
+          fi
