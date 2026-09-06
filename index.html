@@ -9,12 +9,11 @@
 <style>
 :root{
  --bg:#eef2f7;--card:#fff;--text:#0f172a;--muted:#64748b;--border:#dbe3ec;
- --blue:#2563eb;--blue2:#1d4ed8;--green:#15803d;--gold:#d97706;
- --red:#dc2626;--shadow:0 8px 26px rgba(15,23,42,.065)
+ --blue:#2563eb;--green:#15803d;--purple:#7c3aed;--shadow:0 8px 26px rgba(15,23,42,.065)
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-.container{max-width:1520px;margin:auto;padding:22px}
+.container{max-width:1540px;margin:auto;padding:22px}
 .header{background:linear-gradient(135deg,#0b1220,#1e293b);color:#fff;border-radius:18px;padding:27px 30px;margin-bottom:16px;box-shadow:var(--shadow)}
 .eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#93c5fd}
 h1{margin:5px 0 6px;font-size:clamp(28px,3vw,40px);line-height:1.1;letter-spacing:-.04em}
@@ -26,64 +25,50 @@ select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
 .status{margin:13px 0 0;padding:10px 14px;border-radius:10px;background:#eff6ff;color:#1d4ed8;font-size:14px;border:1px solid #dbeafe;display:none}
 .status.error{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
 .dashboard-title{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:20px 3px 10px}
-.dashboard-title h2{font-size:21px;margin:0;letter-spacing:-.02em}
-.dashboard-title span{font-size:13px;color:var(--muted)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.dashboard-title h2{font-size:21px;margin:0;letter-spacing:-.02em}.dashboard-title span{font-size:13px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 17px;box-shadow:var(--shadow)}
-.kpi-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.kpi-value{font-size:25px;font-weight:850;letter-spacing:-.03em;margin-top:4px}
+.kpi-label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.kpi-value{font-size:24px;font-weight:850;letter-spacing:-.03em;margin-top:5px}
 .kpi-detail{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rankings{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.total{color:var(--purple)}.home{color:var(--blue)}.away{color:var(--green)}
+.rankings{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
 .rank-card{background:var(--card);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}
 .rank-head{padding:15px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.rank-head strong{font-size:17px}.rank-head span{font-size:12px;color:var(--muted)}
+.rank-head strong{font-size:16px}.rank-head span{font-size:12px;color:var(--muted)}
 .rank-list{padding:8px 14px 12px}
 .rank-row{display:grid;grid-template-columns:32px 1fr 58px;align-items:center;gap:9px;padding:8px 4px;border-bottom:1px solid #eef2f6}
-.rank-row:last-child{border-bottom:0}
-.rank-pos{font-size:12px;font-weight:800;color:var(--muted);text-align:center}
+.rank-row:last-child{border-bottom:0}.rank-pos{font-size:12px;font-weight:800;color:var(--muted);text-align:center}
 .rank-team{font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rank-value{font-size:14px;font-weight:850;text-align:right}
 .bar-wrap{grid-column:2 / 4;height:5px;background:#edf2f7;border-radius:99px;overflow:hidden;margin-top:-3px}
 .bar-fill{height:100%;border-radius:99px}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.charts{display:grid;grid-template-columns:1fr;gap:16px}
 .chart-card{background:var(--card);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}
 .chart-title{padding:16px 19px 11px;border-bottom:1px solid var(--border);font-size:18px;font-weight:800}
-.chart-subtitle{font-size:13px;color:var(--muted);font-weight:500;margin-top:3px}.chart{width:100%;height:820px}
-.table-card{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow);overflow:hidden}
-.table-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
-.table-head h3{margin:0;font-size:18px}.table-tools{display:flex;gap:8px}
-.search{height:40px;width:220px;border:1px solid #cbd5e1;border-radius:9px;padding:0 11px;font-size:14px;outline:none}
-.search:focus{border-color:var(--blue)}
-.table-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{padding:11px 13px;border-bottom:1px solid #edf1f5;text-align:right;font-size:13px}
-th{background:#f8fafc;color:#475569;font-size:12px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;position:sticky;top:0}
-th:first-child,td:first-child{text-align:left}
-td:first-child{font-weight:700;color:#1e293b}
-tbody tr:hover{background:#f8fafc}
-.pct{font-variant-numeric:tabular-nums;font-weight:700}.home{color:var(--blue)}.away{color:var(--green)}
-.empty{padding:30px;text-align:center;color:var(--muted);font-size:14px}
+.chart-subtitle{font-size:13px;color:var(--muted);font-weight:500;margin-top:3px}
+.chart{width:100%;height:780px}
 .footer{padding:13px 4px 0;color:var(--muted);font-size:12px;text-align:center}
-@media(max-width:1050px){.charts{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.rankings{grid-template-columns:1fr 1fr}.rank-card:last-child{grid-column:1/-1}}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}.rankings{grid-template-columns:1fr}.rank-card:last-child{grid-column:auto}}
 @media(max-width:600px){
  .container{padding:9px}.header{padding:21px 18px;border-radius:15px}h1{font-size:27px}.subtitle{font-size:14px;line-height:1.4}
  .controls{grid-template-columns:1fr;padding:13px;border-radius:13px}select{height:50px;font-size:16px}
  .dashboard-title{display:block;margin:16px 3px 9px}.dashboard-title h2{font-size:19px}.dashboard-title span{display:block;margin-top:3px}
  .kpis{grid-template-columns:repeat(2,1fr);gap:9px}.kpi{padding:13px}.kpi-value{font-size:22px}.kpi-label{font-size:10px}.kpi-detail{font-size:11px}
- .rankings{grid-template-columns:1fr;gap:12px}.rank-card{border-radius:13px}.rank-head{padding:14px 15px}.rank-head strong{font-size:16px}
+ .rankings{grid-template-columns:1fr;gap:12px}.rank-card{border-radius:13px}.rank-head{padding:14px 15px}
  .rank-team{font-size:14px}.charts{gap:12px}.chart-card{border-radius:13px}.chart-title{padding:14px 15px;font-size:17px}.chart{height:760px}
- .table-card{border-radius:13px}.table-head{display:block;padding:14px 15px}.table-tools{margin-top:9px}.search{width:100%;height:44px;font-size:15px}
- th,td{padding:11px 10px;font-size:13px}
 }
 </style>
 </head>
 <body>
 
+
 <div class="container">
 <header class="header">
   <div class="eyebrow">Football Analytics</div>
   <h1>Estatísticas Over / Under Gols</h1>
-  <p class="subtitle">Painel comparativo por clube, com desempenho como mandante e visitante.</p>
+  <p class="subtitle">Painel comparativo por clube, com desempenho total, como mandante e visitante.</p>
 </header>
 
 <section class="controls">
@@ -102,28 +87,23 @@ tbody tr:hover{background:#f8fafc}
 </div>
 
 <section class="kpis">
+  <div class="kpi"><div class="kpi-label">Partidas realizadas</div><div class="kpi-value" id="matchCount">—</div><div class="kpi-detail">jogos no campeonato</div></div>
+  <div class="kpi"><div class="kpi-label">Melhor desempenho total</div><div class="kpi-value total" id="bestTotal">—</div><div class="kpi-detail" id="bestTotalDetail"></div></div>
   <div class="kpi"><div class="kpi-label">Melhor mandante</div><div class="kpi-value home" id="bestHome">—</div><div class="kpi-detail" id="bestHomeDetail"></div></div>
   <div class="kpi"><div class="kpi-label">Melhor visitante</div><div class="kpi-value away" id="bestAway">—</div><div class="kpi-detail" id="bestAwayDetail"></div></div>
-  <div class="kpi"><div class="kpi-label">Média mandante</div><div class="kpi-value" id="avgHome">—</div><div class="kpi-detail">percentual entre os clubes</div></div>
-  <div class="kpi"><div class="kpi-label">Média visitante</div><div class="kpi-value" id="avgAway">—</div><div class="kpi-detail">percentual entre os clubes</div></div>
+  <div class="kpi"><div class="kpi-label">Média geral</div><div class="kpi-value" id="avgTotal">—</div><div class="kpi-detail">percentual entre os clubes</div></div>
 </section>
 
 <section class="rankings">
+  <div class="rank-card"><div class="rank-head"><strong>Ranking · Total</strong><span>Top 5</span></div><div id="totalRanking" class="rank-list"></div></div>
   <div class="rank-card"><div class="rank-head"><strong>Ranking · Mandante</strong><span>Top 5</span></div><div id="homeRanking" class="rank-list"></div></div>
   <div class="rank-card"><div class="rank-head"><strong>Ranking · Visitante</strong><span>Top 5</span></div><div id="awayRanking" class="rank-list"></div></div>
 </section>
 
 <section class="charts">
+  <div class="chart-card"><div class="chart-title">Desempenho Total<div class="chart-subtitle">Todos os jogos realizados por cada clube</div></div><div id="totalChart" class="chart"></div></div>
   <div class="chart-card"><div class="chart-title">Mandante<div class="chart-subtitle">Percentual de jogos no estádio do clube</div></div><div id="homeChart" class="chart"></div></div>
   <div class="chart-card"><div class="chart-title">Visitante<div class="chart-subtitle">Percentual de jogos fora de casa</div></div><div id="awayChart" class="chart"></div></div>
-</section>
-
-<section class="table-card">
-  <div class="table-head"><h3>Comparação por clube</h3><div class="table-tools"><input id="search" class="search" placeholder="Pesquisar clube..." type="search"></div></div>
-  <div class="table-scroll"><table><thead><tr>
-    <th data-key="CLUBE">Clube ↕</th><th data-key="CASA">Mandante ↕</th><th data-key="FORA">Visitante ↕</th><th data-key="DIF">Diferença ↕</th>
-  </tr></thead><tbody id="tableBody"></tbody></table></div>
-  <div id="emptyTable" class="empty" style="display:none">Nenhum clube encontrado.</div>
 </section>
 
 <div class="footer">Dados atualizados pelo GitHub Actions. Os cálculos são realizados diretamente no navegador.</div>
@@ -133,8 +113,6 @@ const leagues=["Alemanha","Alemanha2","Espanha","Espanha2","França","França2",
 const codes={"Alemanha":"D1","Alemanha2":"D2","Espanha":"SP1","Espanha2":"SP2","França":"F1","França2":"F2","Inglaterra":"E0","Inglaterra2":"E1","Itália":"I1","Itália2":"I2","Bélgica":"B1","Holanda":"N1","Portugal":"P1","Turquia":"T1","Grécia":"G1","Escócia":"SC0"};
 const leagueEl=document.getElementById("league"),attrEl=document.getElementById("attribute"),statusEl=document.getElementById("status");
 const summaryTitle=document.getElementById("summaryTitle"),summaryInfo=document.getElementById("summaryInfo");
-const tableBody=document.getElementById("tableBody"),searchEl=document.getElementById("search");
-let currentRows=[], sortKey="CLUBE", sortAsc=true;
 
 leagues.forEach(l=>{const o=document.createElement("option");o.value=l;o.textContent=l;leagueEl.appendChild(o)});
 
@@ -153,7 +131,13 @@ function csv(text){
  const h=rows[0].map(x=>x.trim());
  return rows.slice(1).map(r=>Object.fromEntries(h.map((x,i)=>[x,(r[i]??"").trim()])));
 }
-function norm(rows){return rows.map(r=>({Home:r.HomeTeam??r.Home??"",Away:r.AwayTeam??r.Away??"",HG:Number(r.FTHG??r.HG),AG:Number(r.FTAG??r.AG),Season:r.Season??r.SEASON??""})).filter(r=>r.Home&&r.Away&&Number.isFinite(r.HG)&&Number.isFinite(r.AG))}
+function norm(rows){
+ return rows.map(r=>({
+  Home:r.HomeTeam??r.Home??"",Away:r.AwayTeam??r.Away??"",
+  HG:Number(r.FTHG??r.HG),AG:Number(r.FTAG??r.AG),
+  Season:r.Season??r.SEASON??""
+ })).filter(r=>r.Home&&r.Away&&Number.isFinite(r.HG)&&Number.isFinite(r.AG));
+}
 async function load(league){
  if(codes[league])return norm(csv(await getText(`data/football-data/${codes[league]}.csv`)));
  if(["Dinamarca","Suíça","Noruega","Suécia","Brasil"].includes(league)){
@@ -162,73 +146,119 @@ async function load(league){
   return rows.filter(r=>["Dinamarca","Suíça"].includes(league)?r.Season==="2026/2027":r.Season==="2026");
  }
  if(league==="Austrália"){
-  const r=await fetch("data/australia/a-league.xlsx",{cache:"no-store"});if(!r.ok)throw new Error("Arquivo da A-League não está disponível no repositório.");
+  const r=await fetch("data/australia/a-league.xlsx",{cache:"no-store"});
+  if(!r.ok)throw new Error("Arquivo da A-League não está disponível no repositório.");
   const wb=XLSX.read(await r.arrayBuffer(),{type:"array",cellDates:true}),ws=wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(ws,{range:1,defval:""}).map(x=>({Home:x["Home Team"]??"",Away:x["Away Team"]??"",HG:Number(x["Home Goals"]),AG:Number(x["Away Goals"]),Date:x.Date})).filter(x=>x.Home&&x.Away&&Number.isFinite(x.HG)&&Number.isFinite(x.AG)&&new Date(x.Date)>new Date("2025-10-01"));
+  return XLSX.utils.sheet_to_json(ws,{range:1,defval:""}).map(x=>({
+   Home:x["Home Team"]??"",Away:x["Away Team"]??"",
+   HG:Number(x["Home Goals"]),AG:Number(x["Away Goals"]),Date:x.Date
+  })).filter(x=>x.Home&&x.Away&&Number.isFinite(x.HG)&&Number.isFinite(x.AG)&&new Date(x.Date)>new Date("2025-10-01"));
  }
  throw new Error("Liga não configurada.");
 }
 function calc(data,a){
  const clubs=[...new Set(data.flatMap(r=>[r.Home,r.Away]))],out=[];
+ const matchesMetric=rows=>{
+  if(!rows.length)return 0;
+  let n=0;
+  for(const r of rows){
+   const g=r.HG+r.AG,b=r.HG>0&&r.AG>0;
+   const ok=a==="Over 0.5"?g>.5:a==="Over 1.5"?g>1.5:a==="Over 2.5"?g>2.5:a==="Ambos Marcam"?b:g<1;
+   if(ok)n++;
+  }
+  return +(100*n/rows.length).toFixed(2);
+ };
  for(const c of clubs){
-  const h=data.filter(r=>r.Home===c),v=data.filter(r=>r.Away===c);
-  const metric=rows=>{if(!rows.length)return 0;let n=0;for(const r of rows){const g=r.HG+r.AG,b=r.HG>0&&r.AG>0;const ok=a==="Over 0.5"?g>.5:a==="Over 1.5"?g>1.5:a==="Over 2.5"?g>2.5:a==="Ambos Marcam"?b:g<1;if(ok)n++}return +(100*n/rows.length).toFixed(2)};
-  out.push({CLUBE:c,CASA:metric(h),FORA:metric(v)});
+  const home=data.filter(r=>r.Home===c);
+  const away=data.filter(r=>r.Away===c);
+  const total=[...home,...away];
+  out.push({CLUBE:c,TOTAL:matchesMetric(total),CASA:matchesMetric(home),FORA:matchesMetric(away)});
  }
  return out;
 }
-function drawSingle(id,rows,key,role){
+function drawSingle(id,rows,key,role,color){
  const sorted=[...rows].sort((a,b)=>a[key]-b[key]),mobile=innerWidth<600;
- const h=mobile?Math.max(700,sorted.length*31+150):Math.max(760,sorted.length*29+145);
- const trace={x:sorted.map(r=>r[key]),y:sorted.map(r=>r.CLUBE),type:"bar",orientation:"h",marker:{color:role==="Mandante"?"#2563eb":"#15803d"},text:sorted.map(r=>r[key].toFixed(1)+"%"),textposition:"outside",cliponaxis:false,hovertemplate:"<b>%{y}</b><br>%{x:.2f}%<extra>"+role+"</extra>"};
- const layout={height:h,margin:{l:mobile?105:145,r:62,t:12,b:48},paper_bgcolor:"#fff",plot_bgcolor:"#f8fafc",font:{family:"Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",size:13,color:"#0f172a"},xaxis:{title:{text:"Percentual (%)",font:{size:14}},range:[0,108],dtick:10,ticksuffix:"%",gridcolor:"#dfe6ee",zeroline:false,tickfont:{size:12}},yaxis:{automargin:true,tickfont:{size:13},gridcolor:"rgba(0,0,0,0)"},showlegend:false,bargap:.18,hoverlabel:{font:{size:14}}};
+ const h=mobile?Math.max(700,sorted.length*31+150):Math.max(700,sorted.length*27+145);
+ const trace={
+  x:sorted.map(r=>r[key]),y:sorted.map(r=>r.CLUBE),type:"bar",orientation:"h",
+  marker:{color},
+  text:sorted.map(r=>r[key].toFixed(1)+"%"),
+  textposition:"outside",cliponaxis:false,
+  hovertemplate:"<b>%{y}</b><br>%{x:.2f}%<extra>"+role+"</extra>"
+ };
+ const layout={
+  height:h,margin:{l:mobile?105:145,r:62,t:12,b:48},
+  paper_bgcolor:"#fff",plot_bgcolor:"#f8fafc",
+  font:{family:"Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",size:13,color:"#0f172a"},
+  xaxis:{title:{text:"Percentual (%)",font:{size:14}},range:[0,108],dtick:10,ticksuffix:"%",gridcolor:"#dfe6ee",zeroline:false,tickfont:{size:12}},
+  yaxis:{automargin:true,tickfont:{size:13},gridcolor:"rgba(0,0,0,0)"},
+  showlegend:false,bargap:.18,hoverlabel:{font:{size:14}}
+ };
  Plotly.react(id,[trace],layout,{responsive:true,displaylogo:false,scrollZoom:false});
 }
-function setKpis(rows){
- const h=[...rows].sort((a,b)=>b.CASA-a.CASA),v=[...rows].sort((a,b)=>b.FORA-a.FORA);
- const avg=(key)=>rows.length?(rows.reduce((s,r)=>s+r[key],0)/rows.length).toFixed(1)+"%":"—";
- document.getElementById("bestHome").textContent=h[0]?h[0].CASA.toFixed(1)+"%":"—";
- document.getElementById("bestHomeDetail").textContent=h[0]?h[0].CLUBE:"";
- document.getElementById("bestAway").textContent=v[0]?v[0].FORA.toFixed(1)+"%":"—";
- document.getElementById("bestAwayDetail").textContent=v[0]?v[0].CLUBE:"";
- document.getElementById("avgHome").textContent=avg("CASA");document.getElementById("avgAway").textContent=avg("FORA");
- renderRanking("homeRanking",h,"CASA","Mandante","#2563eb");
- renderRanking("awayRanking",v,"FORA","Visitante","#15803d");
+function renderRanking(id,rows,key,color){
+ const top=[...rows].sort((a,b)=>b[key]-a[key]).slice(0,5);
+ const max=Math.max(...top.map(r=>r[key]),1);
+ document.getElementById(id).innerHTML=top.map((r,i)=>`
+  <div class="rank-row">
+   <div class="rank-pos">${i+1}</div>
+   <div class="rank-team" title="${r.CLUBE}">${r.CLUBE}</div>
+   <div class="rank-value">${r[key].toFixed(1)}%</div>
+   <div class="bar-wrap"><div class="bar-fill" style="width:${(r[key]/max*100).toFixed(1)}%;background:${color}"></div></div>
+  </div>`).join("");
 }
-function renderRanking(id,rows,key,role,color){
- const top=rows.slice(0,5),max=Math.max(...top.map(r=>r[key]),1);
- document.getElementById(id).innerHTML=top.map((r,i)=>`<div class="rank-row"><div class="rank-pos">${i+1}</div><div class="rank-team" title="${r.CLUBE}">${r.CLUBE}</div><div class="rank-value">${r[key].toFixed(1)}%</div><div class="bar-wrap"><div class="bar-fill" style="width:${(r[key]/max*100).toFixed(1)}%;background:${color}"></div></div></div>`).join("");
+function setKpis(rows,matchCount){
+ const total=[...rows].sort((a,b)=>b.TOTAL-a.TOTAL);
+ const home=[...rows].sort((a,b)=>b.CASA-a.CASA);
+ const away=[...rows].sort((a,b)=>b.FORA-a.FORA);
+ const avg=rows.length?(rows.reduce((s,r)=>s+r.TOTAL,0)/rows.length).toFixed(1)+"%":"—";
+ document.getElementById("matchCount").textContent=matchCount.toLocaleString("pt-BR");
+ document.getElementById("bestTotal").textContent=total[0]?total[0].TOTAL.toFixed(1)+"%":"—";
+ document.getElementById("bestTotalDetail").textContent=total[0]?total[0].CLUBE:"";
+ document.getElementById("bestHome").textContent=home[0]?home[0].CASA.toFixed(1)+"%":"—";
+ document.getElementById("bestHomeDetail").textContent=home[0]?home[0].CLUBE:"";
+ document.getElementById("bestAway").textContent=away[0]?away[0].FORA.toFixed(1)+"%":"—";
+ document.getElementById("bestAwayDetail").textContent=away[0]?away[0].CLUBE:"";
+ document.getElementById("avgTotal").textContent=avg;
+ renderRanking("totalRanking",rows,"TOTAL","#7c3aed");
+ renderRanking("homeRanking",rows,"CASA","#2563eb");
+ renderRanking("awayRanking",rows,"FORA","#15803d");
 }
-function renderTable(){
- const q=searchEl.value.trim().toLowerCase();
- let rows=currentRows.filter(r=>r.CLUBE.toLowerCase().includes(q));
- rows.sort((a,b)=>{
-  let av=a[sortKey],bv=b[sortKey];
-  if(sortKey==="DIF"){av=a.CASA-a.FORA;bv=b.CASA-b.FORA}
-  if(typeof av==="string")return sortAsc?av.localeCompare(bv):bv.localeCompare(av);
-  return sortAsc?av-bv:bv-av;
- });
- tableBody.innerHTML=rows.map(r=>`<tr><td>${r.CLUBE}</td><td class="pct home">${r.CASA.toFixed(2)}%</td><td class="pct away">${r.FORA.toFixed(2)}%</td><td class="pct">${(r.CASA-r.FORA>=0?"+":"")+(r.CASA-r.FORA).toFixed(2)} p.p.</td></tr>`).join("");
- document.getElementById("emptyTable").style.display=rows.length?"none":"block";
-}
-function render(result,league,a){
- currentRows=result;
+function render(result,league,a,matchCount){
  summaryTitle.textContent=`${a} · ${league}`;
- summaryInfo.textContent=`${result.length} clubes analisados`;
- setKpis(result);
- drawSingle("homeChart",result,"CASA","Mandante");
- drawSingle("awayChart",result,"FORA","Visitante");
- renderTable();
+ summaryInfo.textContent=`${result.length} clubes analisados · ${matchCount} partidas realizadas`;
+ setKpis(result,matchCount);
+ drawSingle("totalChart",result,"TOTAL","Total","#7c3aed");
+ drawSingle("homeChart",result,"CASA","Mandante","#2563eb");
+ drawSingle("awayChart",result,"FORA","Visitante","#15803d");
 }
 async function update(){
- const league=leagueEl.value,a=attrEl.value;status(`Carregando dados de ${league}...`);
- try{const data=await load(league);if(!data.length)throw new Error("Nenhum jogo encontrado para a liga/período selecionado.");render(calc(data,a),league,a);status(`${data.length} jogos analisados.`);setTimeout(()=>status("",false),1800)}
- catch(e){console.error(e);status("Não foi possível carregar os dados: "+e.message,true,true);Plotly.purge("homeChart");Plotly.purge("awayChart")}
+ const league=leagueEl.value,a=attrEl.value;
+ status(`Carregando dados de ${league}...`);
+ try{
+  const data=await load(league);
+  if(!data.length)throw new Error("Nenhum jogo encontrado para a liga/período selecionado.");
+  render(calc(data,a),league,a,data.length);
+  status(`${data.length} partidas realizadas analisadas.`);
+  setTimeout(()=>status("",false),1800);
+ }catch(e){
+  console.error(e);
+  status("Não foi possível carregar os dados: "+e.message,true,true);
+  ["totalChart","homeChart","awayChart"].forEach(id=>{const el=document.getElementById(id);if(el)Plotly.purge(el)});
+ }
 }
-document.querySelectorAll("th[data-key]").forEach(th=>th.addEventListener("click",()=>{const key=th.dataset.key;if(sortKey===key)sortAsc=!sortAsc;else{sortKey=key;sortAsc=true}renderTable()}));
-searchEl.addEventListener("input",renderTable);
-leagueEl.addEventListener("change",update);attrEl.addEventListener("change",update);
-let resizeTimer;window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{["homeChart","awayChart"].forEach(id=>{const el=document.getElementById(id);if(el)Plotly.Plots.resize(el)})},150)});
+leagueEl.addEventListener("change",update);
+attrEl.addEventListener("change",update);
+let resizeTimer;
+window.addEventListener("resize",()=>{
+ clearTimeout(resizeTimer);
+ resizeTimer=setTimeout(()=>{
+  ["totalChart","homeChart","awayChart"].forEach(id=>{
+   const el=document.getElementById(id);
+   if(el)Plotly.Plots.resize(el);
+  });
+ },150);
+});
 update();
 </script>
 </body>
