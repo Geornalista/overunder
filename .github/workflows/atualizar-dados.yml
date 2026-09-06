@@ -2,217 +2,150 @@ name: Atualizar dados das ligas
 
 on:
   schedule:
-    # Executa a cada 6 horas
-    - cron: "17 */6 * * *"
-
-  # Permite executar manualmente pelo GitHub Actions
+    # Executa 1 vez por dia, às 09:17 UTC (06:17 no horário de Brasília)
+    - cron: "17 9 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: atualizar-dados
+  cancel-in-progress: false
+
 jobs:
-
   update-data:
-
     runs-on: ubuntu-latest
 
     steps:
-
-      # ==========================================================
-      # 1. Baixar o conteúdo atual do repositório
-      # ==========================================================
-
       - name: Checkout
         uses: actions/checkout@v5
-
-
-      # ==========================================================
-      # 2. Criar estrutura de diretórios
-      # ==========================================================
 
       - name: Criar pastas
         run: |
           mkdir -p data/football-data
           mkdir -p data/australia
 
-
-      # ==========================================================
-      # 3. Baixar ligas do Football-Data
-      #
-      # Temporada 2026/2027
-      #
-      # Estes são os mesmos códigos utilizados pelo app Python.
-      # ==========================================================
-
       - name: Baixar ligas football-data
         shell: bash
         run: |
-
-          set -e
+          set -uo pipefail
 
           BASE="https://www.football-data.co.uk"
+          FALHAS=0
+          SUCESSOS=0
+
+          baixar() {
+            local URL="$1"
+            local DESTINO="$2"
+            local NOME="$3"
+            local TEMP="${DESTINO}.tmp"
+
+            echo ""
+            echo "Baixando ${NOME}..."
+            rm -f "${TEMP}"
+
+            if curl \
+              --location \
+              --fail \
+              --retry 4 \
+              --retry-all-errors \
+              --retry-delay 10 \
+              --connect-timeout 30 \
+              --max-time 120 \
+              --silent \
+              --show-error \
+              -A "Mozilla/5.0 (GitHub Actions)" \
+              -o "${TEMP}" \
+              "${URL}"; then
+
+              if [ -s "${TEMP}" ]; then
+                mv "${TEMP}" "${DESTINO}"
+                echo "OK: ${NOME}"
+                SUCESSOS=$((SUCESSOS + 1))
+                return 0
+              fi
+            fi
+
+            rm -f "${TEMP}"
+            echo "::warning::Falha ao baixar ${NOME}. O arquivo anterior será preservado."
+            FALHAS=$((FALHAS + 1))
+            return 0
+          }
 
           echo "=========================================="
           echo "Baixando ligas principais"
           echo "=========================================="
 
-          for LEAGUE in \
-            D1 \
-            D2 \
-            SP1 \
-            SP2 \
-            F1 \
-            F2 \
-            E0 \
-            E1 \
-            I1 \
-            I2 \
-            B1 \
-            N1 \
-            P1 \
-            T1 \
-            G1 \
-            SC0
+          for LEAGUE in D1 D2 SP1 SP2 F1 F2 E0 E1 I1 I2 B1 N1 P1 T1 G1 SC0
           do
-
-            echo ""
-            echo "Baixando ${LEAGUE}.csv ..."
-
-            curl \
-              --location \
-              --fail \
-              --retry 3 \
-              --retry-delay 5 \
-              --connect-timeout 30 \
-              --max-time 120 \
-              --silent \
-              --show-error \
-              -o "data/football-data/${LEAGUE}.csv" \
-              "${BASE}/mmz4281/2627/${LEAGUE}.csv"
-
-            echo "OK: ${LEAGUE}.csv"
-
+            baixar \
+              "${BASE}/mmz4281/2627/${LEAGUE}.csv" \
+              "data/football-data/${LEAGUE}.csv" \
+              "${LEAGUE}.csv"
           done
-
 
           echo ""
           echo "=========================================="
           echo "Baixando ligas adicionais"
           echo "=========================================="
 
-
           for LEAGUE in DNK SWZ NOR SWE BRA
           do
-
-            echo ""
-            echo "Baixando ${LEAGUE}.csv ..."
-
-            curl \
-              --location \
-              --fail \
-              --retry 3 \
-              --retry-delay 5 \
-              --connect-timeout 30 \
-              --max-time 120 \
-              --silent \
-              --show-error \
-              -o "data/football-data/${LEAGUE}.csv" \
-              "${BASE}/new/${LEAGUE}.csv"
-
-            echo "OK: ${LEAGUE}.csv"
-
+            baixar \
+              "${BASE}/new/${LEAGUE}.csv" \
+              "data/football-data/${LEAGUE}.csv" \
+              "${LEAGUE}.csv"
           done
-
 
           echo ""
           echo "=========================================="
-          echo "Download das ligas concluído"
+          echo "Resumo dos downloads"
           echo "=========================================="
+          echo "Sucessos: ${SUCESSOS}"
+          echo "Falhas:   ${FALHAS}"
 
-
-      # ==========================================================
-      # 4. A-League
-      #
-      # O servidor do Australia Sports Betting está retornando
-      # HTTP 403 para requisições originadas pelo GitHub Actions.
-      #
-      # Portanto, NÃO tentamos baixar o arquivo automaticamente.
-      #
-      # Se já existir:
-      #
-      # data/australia/a-league.xlsx
-      #
-      # ele será preservado.
-      # ==========================================================
+          if [ "${SUCESSOS}" -eq 0 ]; then
+            echo "::error::Nenhum arquivo pôde ser atualizado."
+            exit 1
+          fi
 
       - name: Verificar A-League
         shell: bash
         run: |
-
-          echo "=========================================="
-          echo "Verificando arquivo da A-League"
-          echo "=========================================="
-
           if [ -f "data/australia/a-league.xlsx" ]; then
-
-            echo "Arquivo A-League encontrado."
-            echo "Ele será mantido."
-
+            echo "Arquivo A-League encontrado e preservado."
           else
-
-            echo "AVISO: arquivo da A-League não encontrado."
-            echo ""
-            echo "A A-League não será atualizada automaticamente"
-            echo "porque a fonte atualmente retorna HTTP 403"
-            echo "para o GitHub Actions."
-            echo ""
-            echo "As demais ligas continuarão normalmente."
-
+            echo "::warning::Arquivo da A-League não encontrado."
+            echo "A fonte da A-League não é atualizada automaticamente porque retorna HTTP 403 para GitHub Actions."
           fi
-
-
-      # ==========================================================
-      # 5. Mostrar os arquivos que foram baixados
-      # ==========================================================
 
       - name: Verificar arquivos
         run: |
-
           echo "=========================================="
           echo "Arquivos disponíveis"
           echo "=========================================="
+          find data -maxdepth 3 -type f -print | sort
 
-          find data -type f -maxdepth 3 -print
-
-
-      # ==========================================================
-      # 6. Commitar alterações
-      # ==========================================================
-
-      - name: Committar dados atualizados
+      - name: Commitar dados atualizados
         shell: bash
         run: |
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add data/
 
           if git diff --cached --quiet; then
-
             echo "Nenhuma alteração nos dados."
             echo "Nenhum commit será criado."
-
           else
-
-            echo "Alterações encontradas."
-            echo "Criando commit..."
-
             git commit -m "Atualiza dados das ligas"
-
             git push
-
             echo "Dados atualizados com sucesso."
-
           fi
+
+      - name: Resumo final
+        if: always()
+        run: |
+          echo "Workflow finalizado."
+          echo "Falhas isoladas de download não interrompem o workflow."
